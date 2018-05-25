@@ -1,52 +1,55 @@
-***************************************************************************************
-***************************************************************************************
-**																					 **
-**			Sample Size and Power Calcualations for Vaccine Efficacy Trials			 **
-**			via the xact Conditional and Normal Approximation Approaches			 **
-**																					 **
-***************************************************************************************
-***************************************************************************************
-**																					 **
-**			Version 1.0 	Last Updated: 											 **
-**			Developed by Matt Loiacono, MS											 **
-**			Contact: MAL274@pitt.edu												 **
-**																					 **
-**																					 **
-**			This code was developed as a part of a MS Thesis at the University		 **
-**			of Pittsburgh Graduation School of Public Health, Department of 		 **
-**			Biostatistics.															 **
-**																					 **
-**			Please reference the following paper, by Chan & Bohidar (1998),			 **
-**			for any clarifications on the formulas and methodology applied 			 **
-**			in this code:															 **
-**																					 **
-**			Chan, Ivan SF, and Norman R. Bohidar. "Exact power and sample size 		 **
-**			for vaccine efficacy studies." Communications in Statistics-Theory 	 	 **
-**			and Methods 27.6 (1998): 1305-1322.										 **
-**																					 **
-***************************************************************************************
-***************************************************************************************
+***************************************************************************************************
+***************************************************************************************************
+**												 **
+**		Sample Size and Power Calcualations for Vaccine Efficacy Trials			 **
+**		via the xact Conditional and Normal Approximation Approaches			 **
+**												 **
+***************************************************************************************************
+***************************************************************************************************
+**												 **
+**		Version 1.0 	Last Updated: 5/25/2018						 **
+**		Developed by Matt Loiacono, MS							 **
+**		Contact: MAL274@pitt.edu							 **
+**												 **
+**												 **
+**		This code was developed as a part of a MS Thesis at the University		 **
+**		of Pittsburgh Graduation School of Public Health, Department of 		 **
+**		Biostatistics.									 **
+**												 **
+**		Please reference the following paper, by Chan & Bohidar (1998),			 **
+**		for any clarifications on the formulas and methodology applied 			 **
+**		in this code:									 **
+**												 **
+**		Chan, Ivan SF, and Norman R. Bohidar. "Exact power and sample size 		 **
+**		for vaccine efficacy studies." Communications in Statistics-Theory 	 	 **
+**		and Methods 27.6 (1998): 1305-1322.						 **
+**												 **
+***************************************************************************************************
+***************************************************************************************************
 
 
-***************************************************************************************
-**																					 **
-**	MACRO: Sample Size Estimate and Power Calculation via Exact Conditional Approach **
-**																					 **
-***************************************************************************************
+**************************************************************************************************
+**												**
+**	MACRO: Sample Size Estimate and Power Calculation via Exact Conditional Approach 	**
+**												**
+**************************************************************************************************
 
-- Calculates the exact power and estimates sample size for a vaccine efficacy trial, using an Exact Conditional approach based on the Exact Conditional Test (Chan & Bohidar, 1998)
-- Vaccine efficacy here is defined as (1-relative risk) of participants in the test group having the disease of interest, relative to control participants having the disease
-- This method defines the minimum total # of cases required (T), across the test and control group, in order to achieve the pre-specified power
+- Calculates the exact power and estimates sample size for a vaccine efficacy trial, using an Exact 
+  Conditional approach based on the Exact Conditional Test (Chan & Bohidar, 1998)
+- Vaccine efficacy here is defined as (1-relative risk) of participants in the test group having the 
+  disease of interest, relative to control participants having the disease
+- This method defines the minimum total # of cases required (T), across the test and control group, 
+  in order to achieve the pre-specified power
 - Such trial is designed arounding accruing >= (T) total cases
 
 *Required inputs are as follows (with acceptable range of values):
 
-	P1     = disease incidence in the control group 														(0,1)
-	VE1    = true vaccine efficacy of test vaccine, under the alternative hypothesis 						(0,1)
+	P1     = disease incidence in the control group 								(0,1)
+	VE1    = true vaccine efficacy of test vaccine, under the alternative hypothesis 				(0,1)
 	VE0    = minimum vaccine efficacy of test vaccine, under the null (NOTE: must be less than VE1)			(0,1)
 	C	   = ratio of participants (test group:control group) -- Set equal to 1 if a 1:1 ratio is desired 	(0,inf)
-	Power  = pre-specificed minimum power desired to achieve												(0,1)
-	Alpha  = pre-specified maximim one-sided level of the test												(0,1)
+	Power  = pre-specificed minimum power desired to achieve							(0,1)
+	Alpha  = pre-specified maximim one-sided level of the test							(0,1)
 	Output = name of temporary dataset to where the results will be output
 
 When this MACRO is run, a temporary dataset of your naming will be output, along with a printout of this dataset;	
@@ -175,26 +178,48 @@ RUN;
 
 
 
-***************************************************************************************
-**																					 **
-**	MACRO: Vaccine Efficacy Trial Sample Size using the Z Test Normal Approximation	 **
-**																					 **
-***************************************************************************************
+***************************************************************************************************
+**												 **
+**	MACRO: Vaccine Efficacy Trial Sample Size using the Z Test Normal Approximation		 **
+**												 **
+***************************************************************************************************
 -Calculates an estimated asymptotic sample size for a vaccine efficacy trial using the Noormal Approximation approach based on the Z-Test
 
 *Required inputs are as follows (only values between 0 to 1 are accepted):
 
 
-	P1     = disease incidence in the control group 														(0,1)
-	VE1    = true vaccine efficacy of test vaccine, under the alternative hypothesis 						(0,1)
+	P1     = disease incidence in the control group 								(0,1)
+	VE1    = true vaccine efficacy of test vaccine, under the alternative hypothesis 				(0,1)
 	VE0    = minimum vaccine efficacy of test vaccine, under the null (NOTE: must be less than VE1)			(0,1)
 	C	   = ratio of participants (test group:control group) -- Set equal to 1 if a 1:1 ratio is desired 	(0,inf)
-	Power  = pre-specificed minimum power desired to achieve												(0,1)
-	Alpha  = pre-specified maximim one-sided level of the test												(0,1)
+	Power  = pre-specificed minimum power desired to achieve							(0,1)
+	Alpha  = pre-specified maximim one-sided level of the test							(0,1)
 	Output = name of temporary dataset to where the results will be output
 
 When this MACRO is run, a temporary dataset will be output, along with a printout of thhis dataset;	
 
+%MACRO SampleSize_NormalApprox(P1=, VE1=, VE0=,C=, Power=, Alpha=, Output= );
+OPTIONS SPOOL;
+
+/*Calculates and assigns p2 (incidence in test group) */
+DATA _NULL_;
+	p2=(1-&VE1)*&P1;
+	CALL SYMPUT("p2", p2);
+RUN;
+
+/* Calculates all the necessary parameters (sigma0 and sigma1) for the Normal Apprxoimation method and assigns them to macro variables */
+DATA _NULL_;
+	sigma1=(&P2*(1-&P2)+(1/&c)*((1-&VE0)**2)*(&P1)*(1-&P1))**(1/2);
+	a=(1-&VE0)*(1+&c*&P1)+&c+&p2;
+	b=(1-&VE0)*(&c*&P1+&p2);
+	P2z=((a-((a**2)-4*b*(1+&c))**(1/2))/(2*(1+&c)));
+	p1z=p2z/(1-&VE0);
+	sigma0=(p2z*(1-p2z)+(1/&c)*((1-&VE0)**2)*(p1z)*(1-p1z))**(1/2);
+	CALL SYMPUT("sigma0", sigma0);
+	CALL SYMPUT("sigma1", sigma1);
+RUN;
+
+/* Calculates the estimated Normal Approximation Sample Size */
 %MACRO SampleSize_NormalApprox(P1=, VE1=, VE0=,C=, Power=, Alpha=, Output= );
 OPTIONS SPOOL;
 
@@ -225,22 +250,27 @@ DATA &output LABEL;
 	alpha=&alpha;
 	zalpha=QUANTILE("norm", &alpha);
 	zbeta=QUANTILE("norm", 1-&power);
-	N2z=((zalpha*&sigma0+zbeta*&sigma1)**2)/((&P1*(&VE1-&VE0))**2); *sample size for vaccine group;
-	Nz=ceil(n2z)*2;													*total sample size (when c=1, this is simply doubling;
-	DROP zalpha zbeta N2z;
+	N2=ceil(((zalpha*&sigma0+zbeta*&sigma1)**2)/((&P1*(&VE1-&VE0))**2)); *sample size for test group;
+	N1=ceil(N2*&c);							     *sample size for the control group;
+	Ntotal=N1+N2;							     *total sample size;
+	DROP zalpha zbeta;
 	FORMAT power level alpha powerreq PERCENT10.2;
 	LABEL 	P1 = "Incidence Rate in Control"
 			VE1 = "True Efficacy of Test Vaccine"
 			VE0 = "Efficacy Lower Bount"
 			alpha = "Pre-Specificed Level"
 			powerreq = "Required Power"
-			Nz = "Expected Sample Size (Normal Approximation)";
+			N1 = "Excpect Sample Size in Control Group"
+			N2 = "Expected Sample Size in Test Group"
+			Ntotal = "Expected Total Sample Size (Normal Approximation)";
 RUN;	
 
 /* Prints output and labels accordingly */
 PROC PRINT DATA=&output LABEL;
-	VAR P1 VE1 VE0 powerreq alpha Nz;
+	VAR P1 VE1 VE0 powerreq alpha N1 N2 Ntotal;
 RUN;
+
+%MEND SampleSize_NormalApprox;
 
 %MEND SampleSize_NormalApprox;
 
