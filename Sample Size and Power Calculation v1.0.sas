@@ -12,7 +12,7 @@
 **		Contact: MAL274@pitt.edu							 **
 **												 **
 **												 **
-**		This code was developed as a part of a MS Thesis at the University		 **
+**		This code was developed as a part of an MS Thesis at the University		 **
 **		of Pittsburgh Graduation School of Public Health, Department of 		 **
 **		Biostatistics.									 **
 **												 **
@@ -183,7 +183,7 @@ RUN;
 **	MACRO: Vaccine Efficacy Trial Sample Size using the Z Test Normal Approximation		 **
 **												 **
 ***************************************************************************************************
--Calculates an estimated asymptotic sample size for a vaccine efficacy trial using the Noormal Approximation approach based on the Z-Test
+-Calculates the estimated asymptotic sample size for a vaccine efficacy trial using the Noormal Approximation approach based on the Z-Test
 
 *Required inputs are as follows (only values between 0 to 1 are accepted):
 
@@ -269,8 +269,6 @@ RUN;
 PROC PRINT DATA=&output LABEL;
 	VAR P1 VE1 VE0 powerreq alpha N1 N2 Ntotal;
 RUN;
-
-%MEND SampleSize_NormalApprox;
 
 %MEND SampleSize_NormalApprox;
 
